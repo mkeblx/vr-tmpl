@@ -1,0 +1,33 @@
+*, *:before, *:after {
+  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+
+body {
+  background: #fff;
+  color: #000;
+  font-family: sans-serif;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.button {
+	position: fixed;
+	top: 20px;
+	left: 20px;
+	padding: 8px;
+	color: #fff;
+	background-color: #555;
+}
+
+.button:hover {
+	cursor: pointer;
+	background-color: rgb(18, 36, 70);
+}
+
+.button.error {
+	pointer-events: none;
+	background-color: red;
+}

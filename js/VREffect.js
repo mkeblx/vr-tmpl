@@ -26,17 +26,15 @@ THREE.VREffect = function ( renderer, done ) {
 
 	this._init = function() {
 		var self = this;
-		if ( !navigator.mozGetVRDevices && !navigator.getVRDevices ) {
+		if ( !navigator.getVRDevices ) {
 			if ( done ) {
 				done("Your browser is not VR Ready");
 			}
 			return;
 		}
-		if ( navigator.getVRDevices ) {
-			navigator.getVRDevices().then( gotVRDevices );
-		} else {
-			navigator.mozGetVRDevices( gotVRDevices );
-		}
+
+		navigator.getVRDevices().then( gotVRDevices );
+
 		function gotVRDevices( devices ) {
 			var vrHMD;
 			var error;

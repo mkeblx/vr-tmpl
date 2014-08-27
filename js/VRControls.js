@@ -8,7 +8,7 @@ THREE.VRControls = function ( camera, done ) {
 
 	this._init = function () {
 		var self = this;
-		if ( !navigator.mozGetVRDevices && !navigator.getVRDevices ) {
+		if ( !navigator.getVRDevices ) {
 			if ( done ) {
 				done("Your browser is not VR Ready");
 			}
@@ -49,18 +49,21 @@ THREE.VRControls = function ( camera, done ) {
 		}
 		// Applies head rotation from sensors data.
 		if ( camera ) {
+			// camera.position.fromArray( vrState.hmd.position );
 			camera.quaternion.fromArray( vrState.hmd.rotation );
 		}
 	};
 
 	this.getVRState = function() {
 		var vrInput = this._vrInput;
-		var orientation;
-		var vrState;
+		var orientation, position;
+		var inputState, vrState;
 		if ( !vrInput ) {
 			return null;
 		}
-		orientation	= vrInput.getState().orientation;
+		inputState = vrInput.getState();
+		orientation	= inputState.orientation;
+		position = inputState.position;
 		vrState = {
 			hmd : {
 				rotation : [
@@ -68,6 +71,11 @@ THREE.VRControls = function ( camera, done ) {
 					orientation.y,
 					orientation.z,
 					orientation.w
+				],
+				position: [
+					position.x,
+					position.y,
+					position.z
 				]
 			}
 		};

@@ -18,7 +18,7 @@ var objects = [];
 
 
 var has = {
-	WebVR: !!navigator.mozGetVRDevices || !!navigator.getVRDevices
+	WebVR: !!navigator.getVRDevices
 };
 
 
@@ -77,7 +77,7 @@ function setupScene() {
 	var mesh = new THREE.Mesh(geometry, material);
 	mesh.receiveShadow = true;
 
-	scene.add(mesh);
+	//scene.add(mesh);
 
 
 	// cubes
@@ -155,6 +155,7 @@ function onWindowResize() {
 
 function keyPressed (e) {
 	if (e.keyCode == 'R'.charCodeAt(0)) {
+		console.log(vrControls.getVRState());
 		vrControls._vrInput.resetSensor();
 	}
 }
@@ -164,7 +165,16 @@ function animate(t) {
 
 	var vrState = vrControls.getVRState();
 
-	camera.position.copy(controls.getObject().position);
+	var s = 500;
+
+	var cPos = controls.getObject().position;
+	var vrPos = vrState.hmd.position;
+	var pos = vrPos;
+	pos[0] *= s;
+	pos[1] *= s;
+	pos[2] *= s;
+
+	camera.position.fromArray(pos);
 	controls.update(Date.now() - time, vrState);
 
 	vrControls.update();

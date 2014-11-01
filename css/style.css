@@ -1,5 +1,8 @@
+html {
+  box-sizing: border-box;
+}
 *, *:before, *:after {
-  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+  box-sizing: inherit;
 }
 
 body {
@@ -11,9 +14,10 @@ body {
   overflow: hidden;
   margin: 0;
   padding: 0;
+  position: fixed;
 }
 
-.button {
+#vr-button {
 	position: fixed;
 	top: 20px;
 	left: 20px;
@@ -22,12 +26,12 @@ body {
 	background-color: #555;
 }
 
-.button:hover {
+#vr-button:hover {
 	cursor: pointer;
 	background-color: rgb(18, 36, 70);
 }
 
-.button.error {
+#vr-button.error {
 	pointer-events: none;
 	background-color: red;
 }

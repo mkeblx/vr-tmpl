@@ -23,6 +23,7 @@
  */
 THREE.VREffect = function ( renderer, done ) {
 	this._renderer = renderer;
+	this._renderScale = 1;
 
 	this._init = function() {
 		var self = this;
@@ -71,6 +72,16 @@ THREE.VREffect = function ( renderer, done ) {
 		}
 		// Regular render mode if not HMD
 		renderer.render.apply( this._renderer , arguments );
+	};
+
+	this.setRenderScale = function ( scale ) {
+		var renderer = this._renderer;
+		this._renderScale = scale;
+		renderer.setSize( 1920*this._renderScale, 1080*this._renderScale, false );
+	};
+
+	this.getRenderScale = function( ) {
+		return this._renderScale;
 	};
 
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
@@ -137,8 +148,8 @@ THREE.VREffect = function ( renderer, done ) {
 			width: renderer.domElement.width,
 			height: renderer.domElement.height
 		};
-		// Hardcoded Rift display size
-		renderer.setSize( 1280, 800, false );
+
+		renderer.setSize( 1920*this._renderScale, 1080*this._renderScale, false );
 		this.startFullscreen();
 	};
 

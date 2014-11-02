@@ -14,11 +14,9 @@ THREE.VRControls = function ( camera, done ) {
 			}
 			return;
 		}
-		if ( navigator.getVRDevices ) {
-			navigator.getVRDevices().then( gotVRDevices );
-		} else {
-			navigator.mozGetVRDevices( gotVRDevices );
-		}
+
+		navigator.getVRDevices().then( gotVRDevices );
+
 		function gotVRDevices( devices ) {
 			var vrInput;
 			var error;

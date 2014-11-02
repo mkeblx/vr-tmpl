@@ -6,8 +6,6 @@ var camera, scene, renderer;
 
 var fullScreenButton;
 
-var geometry, material, mesh;
-
 var vrEffect;
 var vrControls;
 
@@ -35,6 +33,7 @@ function init() {
 	setupScene();
 	setupLights();
 	setupRendering();
+	setupControls();
 	setupEvents();
 }
 
@@ -119,9 +118,12 @@ function setupRendering() {
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
-	vrControls = new THREE.VRControls(camera);
 
-	document.body.appendChild(renderer.domElement, document.body.firstChild);
+	document.body.appendChild(renderer.domElement);
+}
+
+function setupControls() {
+	vrControls = new THREE.VRControls(camera);
 }
 
 function setupEvents() {
@@ -137,18 +139,27 @@ function onWindowResize() {
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 
-	renderer.setSize(window.innerWidth, window.innerHeight);
+	//renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function keyPressed (e) {
+
+	console.log(e.keyCode);
 	switch (e.keyCode) {
-		case 'R'.charCodeAt(0):
+		case 82: // R
 			vrControls._vrInput.zeroSensor();
 			break;
-		case 'F'.charCodeAt(0):
+		case 70: // F
 			vrEffect.setFullScreen(true);
 			break;
+		case 219: // [
+			vrEffect.setRenderScale(vrEffect.getRenderScale()*1/1.1);
+			break;
+		case 221: // ]
+			vrEffect.setRenderScale(vrEffect.getRenderScale()*1.1);
+			break;
 	}
+
 }
 
 function animate(t) {

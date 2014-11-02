@@ -3,6 +3,8 @@ html {
 }
 *, *:before, *:after {
   box-sizing: inherit;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -12,8 +14,6 @@ body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  margin: 0;
-  padding: 0;
   position: fixed;
 }
 

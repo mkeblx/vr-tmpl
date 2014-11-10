@@ -32,6 +32,7 @@ function init() {
 
 	setupScene();
 	setupLights();
+
 	setupRendering();
 	setupControls();
 	setupEvents();
@@ -123,7 +124,7 @@ function setupRendering() {
 }
 
 function setupControls() {
-	vrControls = new THREE.VRControls(camera);
+	vrControls = new THREE.VRControls();
 }
 
 function setupEvents() {
@@ -147,7 +148,7 @@ function keyPressed (e) {
 	console.log(e.keyCode);
 	switch (e.keyCode) {
 		case 82: // R
-			vrControls._vrInput.zeroSensor();
+			vrControls.zeroSensor();
 			break;
 		case 70: // F
 			vrEffect.setFullScreen(true);
@@ -167,13 +168,13 @@ function animate(t) {
 
 	var dt = clock.getDelta();
 
-	var vrState = vrControls.getVRState();
+	var vrState = vrControls.getState();
 
 	var s = 500;
 
 	if (vrState) {
-		var vrPos = vrState.hmd.position;
-		var pos = vrPos;
+		var vrPos = vrState.position;
+		var pos = [vrPos.x, vrPos.y, vrPos.z];
 		pos[0] *= s;
 		pos[1] *= s;
 		pos[2] *= s;
@@ -181,7 +182,7 @@ function animate(t) {
 		camera.position.fromArray(pos);
 	}
 
-	vrControls.update();
+	vrControls.update(camera);
 
 	render(dt);
 }

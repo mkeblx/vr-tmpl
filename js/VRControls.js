@@ -2,9 +2,7 @@
  * @author dmarcos / https://github.com/dmarcos
  */
 
-THREE.VRControls = function ( camera, done ) {
-
-	this._camera = camera;
+THREE.VRControls = function ( done ) {
 
 	this._init = function () {
 		var self = this;
@@ -38,46 +36,30 @@ THREE.VRControls = function ( camera, done ) {
 
 	this._init();
 
-	this.update = function() {
-		var camera = this._camera;
-		var quat;
-		var vrState = this.getVRState();
-		if ( !vrState ) {
-			return;
+	this.update = function( obj ) {
+
+		if ( this._vrInput === undefined ) return;
+
+		var state = this._vrInput.getState();
+
+		if ( obj && state.orientation !== null ) {
+			obj.quaternion.copy( state.orientation );
 		}
-		// Applies head rotation from sensors data.
-		if ( camera ) {
-			// camera.position.fromArray( vrState.hmd.position );
-			camera.quaternion.fromArray( vrState.hmd.rotation );
-		}
+
 	};
 
-	this.getVRState = function() {
-		var vrInput = this._vrInput;
-		var orientation, position;
-		var inputState, vrState;
-		if ( !vrInput ) {
-			return null;
-		}
-		inputState = vrInput.getState();
-		orientation	= inputState.orientation;
-		position = inputState.position;
-		vrState = {
-			hmd : {
-				rotation : [
-					orientation.x,
-					orientation.y,
-					orientation.z,
-					orientation.w
-				],
-				position: [
-					position.x,
-					position.y,
-					position.z
-				]
-			}
-		};
-		return vrState;
+	this.getState = function() {
+		if ( this._vrInput === undefined ) return null;
+
+		return this._vrInput.getState();
+	};
+
+	this.zeroSensor = function() {
+
+		if ( this._vrInput === undefined ) return;
+
+		this._vrInput.zeroSensor();
+
 	};
 
 };

@@ -174,12 +174,9 @@ function animate(t) {
 
 	if (vrState) {
 		var vrPos = vrState.position;
-		var pos = [vrPos.x, vrPos.y, vrPos.z];
-		pos[0] *= s;
-		pos[1] *= s;
-		pos[2] *= s;
+		var pos = new THREE.Vector3().copy(vrPos).multiplyScalar(s);
 
-		camera.position.fromArray(pos);
+		camera.position.copy(pos);
 	}
 
 	vrControls.update(camera);

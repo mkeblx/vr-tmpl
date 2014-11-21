@@ -176,6 +176,18 @@ THREE.VREffect = function ( renderer, done ) {
 		}
 	};
 
+	this.getTimewarp = function() {
+		if ( this._vrHMD && this._vrHMD.getTimewarp ) {
+			this._vrHMD.getTimewarp();
+		}
+	};
+
+	this.setTimewarp = function( val ) {
+		if ( this._vrHMD && this._vrHMD.setTimewarp ) {
+			this._vrHMD.setTimewarp( val );
+		}
+	};
+
 	this.FovToNDCScaleOffset = function( fov ) {
 		var pxscale = 2.0 / (fov.leftTan + fov.rightTan);
 		var pxoffset = (fov.leftTan - fov.rightTan) * pxscale * 0.5;

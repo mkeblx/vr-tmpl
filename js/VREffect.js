@@ -21,23 +21,27 @@
  * https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
  *
  */
-THREE.VREffect = function ( renderer, done ) {
+THREE.VREffect = function ( renderer, done, config ) {
 
 	var cameraLeft = new THREE.PerspectiveCamera();
 	var cameraRight = new THREE.PerspectiveCamera();
 
 	this._renderer = renderer;
-	this._renderScale = 1;
+	this._renderScale = 1.1;
 
 	this._init = function() {
 		var self = this;
 		if ( !navigator.getVRDevices ) {
+			if ( config ) {
+				setupConfig( config );
+				return;
+			}
+
 			if ( done ) {
 				done("Your browser is not VR Ready");
 			}
 			return;
 		}
-
 		navigator.getVRDevices().then( gotVRDevices );
 
 		function gotVRDevices( devices ) {
@@ -51,15 +55,38 @@ THREE.VREffect = function ( renderer, done ) {
 					self.rightEyeTranslation = vrHMD.getEyeTranslation( "right" );
 					self.leftEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "left" );
 					self.rightEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "right" );
+
 					break; // We keep the first we encounter
 				}
 			}
 			if ( done ) {
 				if ( !vrHMD ) {
-				 error = 'HMD not available';
+					error = 'HMD not available';
 				}
 				done( error );
 			}
+		}
+
+		function setupConfig( config ) {
+			self.stereo = config.stereo || true;
+			
+			var separation = 0.032;
+
+			self.leftEyeTranslation = { x: -separation };
+			self.rightEyeTranslation = { x: separation };
+
+			self.leftEyeFOV = {
+				downDegrees: 50,
+				leftDegrees: 47,
+				rightDegrees: 47,
+				upDegrees: 53
+			};
+			self.rightEyeFOV = {
+				downDegrees: 53,
+				leftDegrees: 47,
+				rightDegrees: 47,
+				upDegrees: 53
+			};
 		}
 	};
 
@@ -70,7 +97,7 @@ THREE.VREffect = function ( renderer, done ) {
 		var vrHMD = this._vrHMD;
 		renderer.enableScissorTest( false );
 		// VR render mode if HMD is available
-		if ( vrHMD ) {
+		if ( vrHMD || this.stereo ) {
 			this.renderStereo.apply( this, arguments );
 			return;
 		}
@@ -244,11 +271,13 @@ THREE.VREffect = function ( renderer, done ) {
 
 	this.FovToProjection = function( fov, rightHanded /* = true */, zNear /* = 0.01 */, zFar /* = 10000.0 */ )
 	{
+		var DEG2RAD = Math.PI / 180.0;
+
 		var fovPort = {
-			upTan: Math.tan(fov.upDegrees * Math.PI / 180.0),
-			downTan: Math.tan(fov.downDegrees * Math.PI / 180.0),
-			leftTan: Math.tan(fov.leftDegrees * Math.PI / 180.0),
-			rightTan: Math.tan(fov.rightDegrees * Math.PI / 180.0)
+			upTan: Math.tan(fov.upDegrees * DEG2RAD),
+			downTan: Math.tan(fov.downDegrees * DEG2RAD),
+			leftTan: Math.tan(fov.leftDegrees * DEG2RAD),
+			rightTan: Math.tan(fov.rightDegrees * DEG2RAD)
 		};
 		return this.FovPortToProjection(fovPort, rightHanded, zNear, zFar);
 	};

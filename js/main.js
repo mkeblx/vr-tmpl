@@ -106,7 +106,7 @@ function setupLights() {
 
 function setupRendering() {
 	renderer = new THREE.WebGLRenderer({
-		antialias: false
+		antialias: true
 	});
 	renderer.setClearColor(0xffffff, 0);
 
@@ -117,8 +117,10 @@ function setupRendering() {
 		}
 	}
 
+	var config = {  };
+
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
+	vrEffect = new THREE.VREffect(renderer, VREffectLoaded, config);
 
 	document.body.appendChild(renderer.domElement);
 }

@@ -106,9 +106,8 @@ THREE.VREffect = function ( renderer, done, config ) {
 	};
 
 	this.setRenderScale = function ( scale ) {
-		var renderer = this._renderer;
 		this._renderScale = scale;
-		renderer.setSize( 1920*this._renderScale, 1080*this._renderScale, false );
+		this._renderer.setSize( 1920*this._renderScale, 1080*this._renderScale, false );
 	};
 
 	this.getRenderScale = function( ) {
@@ -178,8 +177,9 @@ THREE.VREffect = function ( renderer, done, config ) {
 			height: renderer.domElement.height
 		};
 
-		this.setRenderScale( this._renderScale );
 		this.startFullscreen();
+
+		setTimeout( this.setRenderScale.bind( this, this._renderScale ), 1000 );
 	};
 
 	this.startFullscreen = function() {

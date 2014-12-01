@@ -4,6 +4,8 @@
 
 THREE.VRControls = function ( done ) {
 
+	this.scale = 1;
+
 	this._init = function () {
 		var self = this;
 		if ( !navigator.getVRDevices ) {
@@ -46,12 +48,28 @@ THREE.VRControls = function ( done ) {
 			obj.quaternion.copy( state.orientation );
 		}
 
+		if (obj && state.position !== null ) {
+			var pos = new THREE.Vector3()
+				.copy( state.position )
+				.multiplyScalar( this.scale );
+
+			obj.position.copy( pos );
+		}
+
 	};
 
 	this.getState = function() {
 		if ( this._vrInput === undefined ) return null;
 
 		return this._vrInput.getState();
+	};
+
+	this.getScale = function() {
+		return this.scale;
+	};
+
+	this.setScale = function(val) {
+		this.scale = val;
 	};
 
 	this.zeroSensor = function() {

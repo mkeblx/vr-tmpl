@@ -7,7 +7,9 @@ var camera, scene, renderer;
 var fullScreenButton;
 
 var vrEffect;
+
 var vrControls;
+var posScale = 500;
 
 var objects = [];
 
@@ -127,6 +129,7 @@ function setupRendering() {
 
 function setupControls() {
 	vrControls = new THREE.VRControls();
+	vrControls.setScale(posScale);
 }
 
 function setupEvents() {
@@ -161,6 +164,12 @@ function keyPressed (e) {
 		case 221: // ]
 			vrEffect.setRenderScale(vrEffect.getRenderScale()*1.1);
 			break;
+		case 188: // <
+			vrControls.setScale(vrControls.getScale()*1/1.1);
+			break;
+		case 190: // >
+			vrControls.setScale(vrControls.getScale()*1.1);
+			break;
 	}
 
 }
@@ -171,15 +180,6 @@ function animate(t) {
 	var dt = clock.getDelta();
 
 	var vrState = vrControls.getState();
-
-	var s = 500;
-
-	if (vrState) {
-		var vrPos = vrState.position;
-		var pos = new THREE.Vector3().copy(vrPos).multiplyScalar(s);
-
-		camera.position.copy(pos);
-	}
 
 	vrControls.update(camera);
 

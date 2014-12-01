@@ -178,7 +178,7 @@ THREE.VREffect = function ( renderer, done, config ) {
 			height: renderer.domElement.height
 		};
 
-		renderer.setSize( 1920*this._renderScale, 1080*this._renderScale, false );
+		this.setRenderScale( this._renderScale );
 		this.startFullscreen();
 	};
 

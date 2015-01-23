@@ -110,6 +110,7 @@ function setupRendering() {
 	renderer = new THREE.WebGLRenderer({
 		antialias: true
 	});
+	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setClearColor(0xffffff, 0);
 
 	function VREffectLoaded(error) {
@@ -134,7 +135,7 @@ function setupControls() {
 
 function setupEvents() {
 	window.addEventListener('resize', onWindowResize, false);
-	document.addEventListener('keydown', keyPressed, false);
+	document.addEventListener('keydown', keyDown, false);
 
 	fullScreenButton.addEventListener('click', function(){
 		vrEffect.setFullScreen(true);
@@ -145,10 +146,10 @@ function onWindowResize() {
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 
-	//renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function keyPressed (e) {
+function keyDown(e) {
 
 	console.log(e.keyCode);
 	switch (e.keyCode) {
@@ -159,10 +160,12 @@ function keyPressed (e) {
 			vrEffect.setFullScreen(true);
 			break;
 		case 219: // [
-			vrEffect.setRenderScale(vrEffect.getRenderScale()*1/1.1);
+			if (document.mozFullScreenElement || document.webkitFullscreenElement)
+				vrEffect.setRenderScale(vrEffect.getRenderScale()*1/1.1);
 			break;
 		case 221: // ]
-			vrEffect.setRenderScale(vrEffect.getRenderScale()*1.1);
+			if (document.mozFullScreenElement || document.webkitFullscreenElement)
+				vrEffect.setRenderScale(vrEffect.getRenderScale()*1.1);
 			break;
 		case 188: // <
 			vrControls.setScale(vrControls.getScale()*1/1.1);
@@ -178,8 +181,6 @@ function animate(t) {
 	requestAnimationFrame(animate);
 
 	var dt = clock.getDelta();
-
-	var vrState = vrControls.getState();
 
 	vrControls.update(camera);
 

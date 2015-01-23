@@ -95,7 +95,6 @@ THREE.VREffect = function ( renderer, done, config ) {
 	this.render = function ( scene, camera ) {
 		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
-		renderer.enableScissorTest( false );
 		// VR render mode if HMD is available
 		if ( vrHMD || this.stereo ) {
 			this.renderStereo.apply( this, arguments );
@@ -105,9 +104,11 @@ THREE.VREffect = function ( renderer, done, config ) {
 		renderer.render.apply( this._renderer , arguments );
 	};
 
-	this.setRenderScale = function ( scale ) {
+	this.setRenderScale = function ( scale, updateStyle ) {
+		updateStyle = updateStyle !== undefined ? updateStyle : true;
+
 		this._renderScale = scale;
-		this._renderer.setSize( 1920*this._renderScale, 1080*this._renderScale, false );
+		this._renderer.setSize( 1920*this._renderScale, 1080*this._renderScale, updateStyle );
 	};
 
 	this.getRenderScale = function( ) {
@@ -119,8 +120,8 @@ THREE.VREffect = function ( renderer, done, config ) {
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
-		var rendererWidth = renderer.domElement.width / renderer.devicePixelRatio;
-		var rendererHeight = renderer.domElement.height / renderer.devicePixelRatio;
+		var rendererWidth = renderer.domElement.clientWidth;
+		var rendererHeight = renderer.domElement.clientHeight;
 		var eyeDivisionLine = rendererWidth / 2;
 
 		renderer.enableScissorTest( true );
@@ -192,7 +193,7 @@ THREE.VREffect = function ( renderer, done, config ) {
 
 		document.addEventListener( fullScreenChange, onFullScreenChanged, false );
 		function onFullScreenChanged() {
-			if ( !document.mozFullScreenElement && !document.webkitFullScreenElement ) {
+			if ( !document.mozFullScreenElement && !document.webkitFullscreenElement ) {
 				self.setFullScreen( false );
 			}
 		}

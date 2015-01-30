@@ -70,10 +70,10 @@ THREE.VREffect = function ( renderer, done, config ) {
 		function setupConfig( config ) {
 			self.stereo = config.stereo || true;
 			
-			var separation = 0.032;
+			var separation = config.separation !== undefined ? config.separation : 0.064;
 
-			self.leftEyeTranslation = { x: -separation };
-			self.rightEyeTranslation = { x: separation };
+			self.leftEyeTranslation = { x: -separation/2 };
+			self.rightEyeTranslation = { x: separation/2 };
 
 			self.leftEyeFOV = {
 				downDegrees: 50,
@@ -82,7 +82,7 @@ THREE.VREffect = function ( renderer, done, config ) {
 				upDegrees: 53
 			};
 			self.rightEyeFOV = {
-				downDegrees: 53,
+				downDegrees: 50,
 				leftDegrees: 47,
 				rightDegrees: 47,
 				upDegrees: 53
@@ -125,7 +125,7 @@ THREE.VREffect = function ( renderer, done, config ) {
 		var eyeDivisionLine = rendererWidth / 2;
 
 		renderer.enableScissorTest( true );
-		renderer.clear();
+		if (forceClear === true) renderer.clear();
 
 		if ( camera.parent === undefined ) {
 			camera.updateMatrixWorld();

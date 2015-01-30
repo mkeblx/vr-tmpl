@@ -1,20 +1,20 @@
 html {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 *, *:before, *:after {
-  box-sizing: inherit;
-  margin: 0;
-  padding: 0;
+	box-sizing: inherit;
+	margin: 0;
+	padding: 0;
 }
 
 body {
-  background: #fff;
-  color: #000;
-  font-family: sans-serif;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  position: fixed;
+	background: #fff;
+	color: #000;
+	font-family: sans-serif;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	position: fixed;
 }
 
 #vr-button {
@@ -24,6 +24,10 @@ body {
 	padding: 8px;
 	color: #fff;
 	background-color: #555;
+
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
 }
 
 #vr-button:hover {

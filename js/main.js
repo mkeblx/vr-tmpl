@@ -2,7 +2,8 @@
 
 var clock = new THREE.Clock();
 
-var camera, scene, renderer;
+var renderer, element;
+var camera, scene;
 
 var fullScreenButton;
 
@@ -36,6 +37,7 @@ function init() {
 	setupLights();
 
 	setupRendering();
+
 	setupControls();
 	setupEvents();
 }
@@ -125,12 +127,28 @@ function setupRendering() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	vrEffect = new THREE.VREffect(renderer, VREffectLoaded, config);
 
-	document.body.appendChild(renderer.domElement);
+	element = renderer.domElement;
+	document.body.appendChild(element);
 }
 
 function setupControls() {
 	vrControls = new THREE.VRControls();
 	vrControls.setScale(posScale);
+
+	function setOrientationControls(e) {
+		if (!e.alpha) {
+			return;
+		}
+
+		vrControls = new THREE.DeviceOrientationControls(camera, true);
+		vrControls.connect();
+		vrControls.update();
+
+		renderer.domElement.addEventListener('click', fullscreen, false);
+
+		window.removeEventListener('deviceorientation', setOrientationControls, true);
+	}
+	window.addEventListener('deviceorientation', setOrientationControls, true);
 }
 
 function setupEvents() {
@@ -147,6 +165,19 @@ function onWindowResize() {
 	camera.updateProjectionMatrix();
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// for mobile
+function fullscreen() {
+	if (element.requestFullscreen) {
+		element.requestFullscreen();
+	} else if (element.msRequestFullscreen) {
+		element.msRequestFullscreen();
+	} else if (element.mozRequestFullScreen) {
+		element.mozRequestFullScreen();
+	} else if (element.webkitRequestFullscreen) {
+		element.webkitRequestFullscreen();
+	}
 }
 
 function keyDown(e) {
@@ -182,14 +213,14 @@ function animate(t) {
 
 	var dt = clock.getDelta();
 
-	vrControls.update(camera);
-
+	update(dt);
 	render(dt);
+}
+
+function update(dt) {
+	vrControls.update(camera);
 }
 
 function render(dt) {
 	vrEffect.render(scene, camera);
 }
-
-
-

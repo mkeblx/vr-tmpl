@@ -5,6 +5,8 @@ var clock = new THREE.Clock();
 var renderer, element;
 var camera, scene;
 
+var player, head;
+
 var fullScreenButton;
 
 var vrEffect;
@@ -33,19 +35,27 @@ function init() {
 
 	fullScreenButton = document.querySelector('#vr-button');
 
-	setupScene();
-	setupLights();
+	scene = new THREE.Scene();
+	scene.fog = new THREE.Fog(0xffffff, 0, 1500);
+
+	player = new THREE.Object3D();
+	head = new THREE.Object3D();
+
+	head.add(camera);
+	player.add(head);
+	scene.add(player);
 
 	setupRendering();
+
+	setupWorld();
+	setupLights();
 
 	setupControls();
 	setupEvents();
 }
 
 
-function setupScene() {
-	scene = new THREE.Scene();
-	scene.fog = new THREE.Fog(0xffffff, 0, 1500);
+function setupWorld() {
 
 	// floor
 	var geometry = new THREE.PlaneGeometry(2000, 2000, 1, 1);
@@ -218,7 +228,7 @@ function animate(t) {
 }
 
 function update(dt) {
-	vrControls.update(camera);
+	vrControls.update(head);
 }
 
 function render(dt) {

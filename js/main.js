@@ -15,7 +15,7 @@ var vrControls;
 var posScale = 500;
 
 var objects = [];
-
+var raycaster, INTERSECTED;
 
 var has = {
 	WebVR: !!navigator.getVRDevices
@@ -31,19 +31,23 @@ function load() {
 
 
 function init() {
-	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
-
 	fullScreenButton = document.querySelector('#vr-button');
 
 	scene = new THREE.Scene();
 	scene.fog = new THREE.Fog(0xffffff, 0, 1500);
 
-	player = new THREE.Object3D();
-	head = new THREE.Object3D();
+	raycaster = new THREE.Raycaster();
 
+	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
+
+	head = new THREE.Object3D();
 	head.add(camera);
+
+	player = new THREE.Object3D();
 	player.add(head);
+
 	scene.add(player);
+
 
 	setupRendering();
 
@@ -129,6 +133,10 @@ function setupRendering() {
 		if (error) {
 			fullScreenButton.innerHTML = error;
 			fullScreenButton.classList.add('error');
+		} else {
+			fullScreenButton.addEventListener('click', function(){
+				vrEffect.setFullScreen(true);
+			}, true);
 		}
 	}
 
@@ -154,7 +162,7 @@ function setupControls() {
 		vrControls.connect();
 		vrControls.update();
 
-		renderer.domElement.addEventListener('click', fullscreen, false);
+		fullScreenButton.addEventListener('click', fullscreen, false);
 
 		window.removeEventListener('deviceorientation', setOrientationControls, true);
 	}
@@ -164,10 +172,6 @@ function setupControls() {
 function setupEvents() {
 	window.addEventListener('resize', onWindowResize, false);
 	document.addEventListener('keydown', keyDown, false);
-
-	fullScreenButton.addEventListener('click', function(){
-		vrEffect.setFullScreen(true);
-	}, true);
 }
 
 function onWindowResize() {
@@ -228,6 +232,27 @@ function animate(t) {
 }
 
 function update(dt) {
+  var dir = new THREE.Vector3(0,0,-1);
+  dir = dir.applyQuaternion( head.quaternion );
+
+	raycaster.set( head.position, dir );
+
+	var intersects = raycaster.intersectObjects( objects, false );
+
+	if ( intersects.length > 0 ) {
+		if ( INTERSECTED != intersects[ 0 ].object ) {
+			if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+			INTERSECTED = intersects[ 0 ].object;
+			INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+			INTERSECTED.material.emissive.setHex( 0xff0000 );
+		}
+	} else {
+		if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+		INTERSECTED = null;
+	}
+
 	vrControls.update(head);
 }
 

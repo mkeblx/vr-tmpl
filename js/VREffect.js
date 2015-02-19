@@ -124,9 +124,6 @@ THREE.VREffect = function ( renderer, done, config ) {
 		var rendererHeight = renderer.domElement.clientHeight;
 		var eyeDivisionLine = rendererWidth / 2;
 
-		renderer.enableScissorTest( true );
-		if (forceClear === true) renderer.clear();
-
 		if ( camera.parent === undefined ) {
 			camera.updateMatrixWorld();
 		}
@@ -139,6 +136,9 @@ THREE.VREffect = function ( renderer, done, config ) {
 
 		cameraLeft.translateX( leftEyeTranslation.x );
 		cameraRight.translateX( rightEyeTranslation.x );
+
+		renderer.enableScissorTest( true );
+		if (forceClear === true) renderer.clear();
 
 		// render left eye
 		renderer.setViewport( 0, 0, eyeDivisionLine, rendererHeight );

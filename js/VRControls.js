@@ -49,11 +49,7 @@ THREE.VRControls = function ( done ) {
 		}
 
 		if (obj && state.position !== null ) {
-			var pos = new THREE.Vector3()
-				.copy( state.position )
-				.multiplyScalar( this.scale );
-
-			obj.position.copy( pos );
+			obj.position.copy( state.position ).multiplyScalar( this.scale );
 		}
 
 	};
@@ -73,11 +69,9 @@ THREE.VRControls = function ( done ) {
 	};
 
 	this.zeroSensor = function() {
-
 		if ( this._vrInput === undefined ) return;
 
-		this._vrInput.zeroSensor();
-
+		this._vrInput.zeroSensor && this._vrInput.zeroSensor();
 	};
 
 };

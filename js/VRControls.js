@@ -2,43 +2,20 @@
  * @author dmarcos / https://github.com/dmarcos
  */
 
-THREE.VRControls = function ( done ) {
+THREE.VRControls = function ( obj, hmd ) {
 
 	this.scale = 1;
 
 	this._init = function () {
 		var self = this;
-		if ( !navigator.getVRDevices ) {
-			if ( done ) {
-				done("Your browser is not VR Ready");
-			}
-			return;
-		}
-
-		navigator.getVRDevices().then( gotVRDevices );
-
-		function gotVRDevices( devices ) {
-			var vrInput;
-			var error;
-			for ( var i = 0; i < devices.length; ++i ) {
-				if ( devices[i] instanceof PositionSensorVRDevice ) {
-					vrInput = devices[i]
-					self._vrInput = vrInput;
-					break; // We keep the first we encounter
-				}
-			}
-			if ( done ) {
-				if ( !vrInput ) {
-				 error = 'HMD not available';
-				}
-				done( error );
-			}
-		}
+		self._vrInput = hmd.getInput();
+		self.obj = obj;
 	};
 
 	this._init();
 
-	this.update = function( obj ) {
+	this.update = function( ) {
+		var obj = this.obj;
 
 		if ( this._vrInput === undefined ) return;
 

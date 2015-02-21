@@ -9,6 +9,8 @@ var player, head;
 
 var fullScreenButton;
 
+var vrHMD;
+
 var vrEffect;
 
 var vrControls;
@@ -21,17 +23,31 @@ var has = {
 	WebVR: !!navigator.getVRDevices
 };
 
+vrHMD = new THREE.VRHMD( load );
 
-window.addEventListener('load', load);
+function load(error) {
+	fullScreenButton = document.querySelector('#vr-button');	
 
-function load() {
+	if (error) {
+		fullScreenButton.innerHTML = error;
+		fullScreenButton.classList.add('error');
+
+		console.log(error);
+
+		return;
+	}
+
+	fullScreenButton.addEventListener('click', function(){
+		vrEffect.setFullScreen(true);
+	}, true);
+
+
 	init();
 	animate();
 }
 
 
 function init() {
-	fullScreenButton = document.querySelector('#vr-button');
 
 	scene = new THREE.Scene();
 	scene.fog = new THREE.Fog(0xffffff, 0, 1500);
@@ -129,28 +145,16 @@ function setupRendering() {
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setClearColor(0xffffff, 0);
 
-	function VREffectLoaded(error) {
-		if (error) {
-			fullScreenButton.innerHTML = error;
-			fullScreenButton.classList.add('error');
-		} else {
-			fullScreenButton.addEventListener('click', function(){
-				vrEffect.setFullScreen(true);
-			}, true);
-		}
-	}
-
-	var config = {  };
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	vrEffect = new THREE.VREffect(renderer, VREffectLoaded, config);
+	vrEffect = new THREE.VREffect(renderer, vrHMD );
 
 	element = renderer.domElement;
 	document.body.appendChild(element);
 }
 
 function setupControls() {
-	vrControls = new THREE.VRControls();
+	vrControls = new THREE.VRControls(head, vrHMD );//.getInput() );
 	vrControls.setScale(posScale);
 
 	function setOrientationControls(e) {
@@ -253,7 +257,7 @@ function update(dt) {
 		INTERSECTED = null;
 	}
 
-	vrControls.update(head);
+	vrControls.update();
 }
 
 function render(dt) {

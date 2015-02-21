@@ -1,27 +1,5 @@
-/**
- * @author dmarcos / https://github.com/dmarcos
- *
- * It handles stereo rendering
- * If mozGetVRDevices and getVRDevices APIs are not available it gracefuly falls back to a
- * regular renderer
- *
- * The HMD supported is the Oculus DK1 and The Web API doesn't currently allow
- * to query for the display resolution (only the chrome API allows it).
- * The dimensions of the screen are temporarly hardcoded (1280 x 800).
- *
- * For VR mode to work it has to be used with the Oculus enabled builds of Firefox or Chrome:
- *
- * Firefox:
- *
- * OSX: http://people.mozilla.com/~vladimir/vr/firefox-33.0a1.en-US.mac.dmg
- * WIN: http://people.mozilla.com/~vladimir/vr/firefox-33.0a1.en-US.win64-x86_64.zip
- *
- * Chrome builds:
- *
- * https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
- *
- */
-THREE.VREffect = function ( renderer, done, config ) {
+
+THREE.VREffect = function ( renderer, hmd ) {
 
 	var cameraLeft = new THREE.PerspectiveCamera();
 	var cameraRight = new THREE.PerspectiveCamera();
@@ -31,72 +9,22 @@ THREE.VREffect = function ( renderer, done, config ) {
 
 	this._init = function() {
 		var self = this;
-		if ( !navigator.getVRDevices ) {
-			if ( config ) {
-				setupConfig( config );
-				return;
-			}
 
-			if ( done ) {
-				done("Your browser is not VR Ready");
-			}
-			return;
-		}
-		navigator.getVRDevices().then( gotVRDevices );
-
-		function gotVRDevices( devices ) {
-			var vrHMD;
-			var error;
-			for ( var i = 0; i < devices.length; ++i ) {
-				if ( devices[i] instanceof HMDVRDevice ) {
-					vrHMD = devices[i];
-					self._vrHMD = vrHMD;
-					self.leftEyeTranslation = vrHMD.getEyeTranslation( "left" );
-					self.rightEyeTranslation = vrHMD.getEyeTranslation( "right" );
-					self.leftEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "left" );
-					self.rightEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "right" );
-
-					break; // We keep the first we encounter
-				}
-			}
-			if ( done ) {
-				if ( !vrHMD ) {
-					error = 'HMD not available';
-				}
-				done( error );
-			}
-		}
-
-		function setupConfig( config ) {
-			self.stereo = config.stereo || true;
-			
-			var separation = config.separation !== undefined ? config.separation : 0.064;
-
-			self.leftEyeTranslation = { x: -separation/2 };
-			self.rightEyeTranslation = { x: separation/2 };
-
-			self.leftEyeFOV = {
-				downDegrees: 50,
-				leftDegrees: 47,
-				rightDegrees: 47,
-				upDegrees: 53
-			};
-			self.rightEyeFOV = {
-				downDegrees: 50,
-				leftDegrees: 47,
-				rightDegrees: 47,
-				upDegrees: 53
-			};
-		}
+		var vrHMD = hmd.getHMD();
+		self._vrHMD = vrHMD;
+		self.leftEyeTranslation = vrHMD.getEyeTranslation( "left" );
+		self.rightEyeTranslation = vrHMD.getEyeTranslation( "right" );
+		self.leftEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "left" );
+		self.rightEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "right" );
 	};
 
 	this._init();
 
-	this.render = function ( scene, camera ) {
+	this.render = function ( scene, camera, renderTarget, forceClear ) {
 		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
 		// VR render mode if HMD is available
-		if ( vrHMD || this.stereo ) {
+		if ( vrHMD ) {
 			this.renderStereo.apply( this, arguments );
 			return;
 		}
@@ -115,14 +43,15 @@ THREE.VREffect = function ( renderer, done, config ) {
 		return this._renderScale;
 	};
 
+
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
 
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
-		var rendererWidth = renderer.domElement.clientWidth;
-		var rendererHeight = renderer.domElement.clientHeight;
-		var eyeDivisionLine = rendererWidth / 2;
+		var renderWidth = renderTarget ? renderTarget.width : renderer.domElement.clientWidth;
+		var renderHeight = renderTarget ? renderTarget.height : renderer.domElement.clientHeight;
+		var eyeDivisionLine = renderWidth / 2;
 
 		if ( camera.parent === undefined ) {
 			camera.updateMatrixWorld();
@@ -137,21 +66,30 @@ THREE.VREffect = function ( renderer, done, config ) {
 		cameraLeft.translateX( leftEyeTranslation.x );
 		cameraRight.translateX( rightEyeTranslation.x );
 
-		renderer.enableScissorTest( true );
-		if (forceClear === true) renderer.clear();
+		if (renderTarget)
+			renderer.setRenderTarget( renderTarget );
 
 		// render left eye
-		renderer.setViewport( 0, 0, eyeDivisionLine, rendererHeight );
-		renderer.setScissor( 0, 0, eyeDivisionLine, rendererHeight );
-		renderer.render( scene, cameraLeft );
+		crop( 0,0, eyeDivisionLine,renderHeight );
+		renderer.render( scene, cameraLeft, renderTarget, forceClear );
 
 		// render right eye
-		renderer.setViewport( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
-		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
-		renderer.render( scene, cameraRight );
+		crop( eyeDivisionLine,0, eyeDivisionLine,renderHeight );
+		renderer.render( scene, cameraRight, renderTarget, forceClear );
 
+		// restore...
+		renderer.setViewport( 0,0, renderWidth, renderHeight );
+		renderer.setScissor( 0,0, renderWidth, renderHeight );
 		renderer.enableScissorTest( false );
+
+
+		function crop(x, y, w, h) {
+			renderer.setViewport( x, y, w, h );
+			renderer.setScissor( x, y, w, h );
+			renderer.enableScissorTest( true );
+		}
 	};
+
 
 	this.setFullScreen = function( enable ) {
 		var renderer = this._renderer;
@@ -189,7 +127,7 @@ THREE.VREffect = function ( renderer, done, config ) {
 		var vrHMD = this._vrHMD;
 		var canvas = renderer.domElement;
 		var fullScreenChange =
-			canvas.mozRequestFullScreen? 'mozfullscreenchange' : 'webkitfullscreenchange';
+			canvas.mozRequestFullScreen ? 'mozfullscreenchange' : 'webkitfullscreenchange';
 
 		document.addEventListener( fullScreenChange, onFullScreenChanged, false );
 		function onFullScreenChanged() {
@@ -204,6 +142,7 @@ THREE.VREffect = function ( renderer, done, config ) {
 		}
 	};
 
+
 	this.FovToNDCScaleOffset = function( fov ) {
 		var pxscale = 2.0 / (fov.leftTan + fov.rightTan);
 		var pxoffset = (fov.leftTan - fov.rightTan) * pxscale * 0.5;
@@ -212,8 +151,7 @@ THREE.VREffect = function ( renderer, done, config ) {
 		return { scale: [pxscale, pyscale], offset: [pxoffset, pyoffset] };
 	};
 
-	this.FovPortToProjection = function( fov, rightHanded /* = true */, zNear /* = 0.01 */, zFar /* = 10000.0 */ )
-	{
+	this.FovPortToProjection = function( fov, rightHanded /* = true */, zNear /* = 0.01 */, zFar /* = 10000.0 */ ) {
 		rightHanded = rightHanded === undefined ? true : rightHanded;
 		zNear = zNear === undefined ? 0.01 : zNear;
 		zFar = zFar === undefined ? 10000.0 : zFar;
@@ -258,8 +196,7 @@ THREE.VREffect = function ( renderer, done, config ) {
 		return mobj;
 	};
 
-	this.FovToProjection = function( fov, rightHanded /* = true */, zNear /* = 0.01 */, zFar /* = 10000.0 */ )
-	{
+	this.FovToProjection = function( fov, rightHanded /* = true */, zNear /* = 0.01 */, zFar /* = 10000.0 */ ) {
 		var DEG2RAD = Math.PI / 180.0;
 
 		var fovPort = {

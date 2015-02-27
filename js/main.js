@@ -54,6 +54,7 @@ function init() {
 	head.add(camera);
 
 	player = new THREE.Object3D();
+	player.position.set(0,0,30);
 	player.add(head);
 
 	scene.add(player);
@@ -87,7 +88,6 @@ function setupWorld() {
 	mesh.receiveShadow = true;
 
 	//scene.add(mesh);
-
 
 	// cubes
 	var cubes = new THREE.Object3D();
@@ -124,6 +124,7 @@ function setupWorld() {
 	cubes.scale.set(s,s,s);
 	scene.add(cubes);
 }
+
 
 function setupLights() {
 	var light = new THREE.DirectionalLight(0xffffff, 1.5);
@@ -209,10 +210,12 @@ function animate(t) {
 }
 
 function update(dt) {
+	var pos = head.getWorldPosition();
+
   var dir = new THREE.Vector3(0,0,-1);
   dir = dir.applyQuaternion( head.quaternion );
 
-	raycaster.set( head.position, dir );
+	raycaster.set( pos, dir );
 
 	var intersects = raycaster.intersectObjects( objects, false );
 
@@ -229,6 +232,8 @@ function update(dt) {
 
 		INTERSECTED = null;
 	}
+
+	player.position.z -= 0.3*dt;
 
 	vrControls.update();
 }

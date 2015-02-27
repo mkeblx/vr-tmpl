@@ -14,14 +14,10 @@ var vrHMD;
 var vrEffect;
 
 var vrControls;
-var posScale = 500;
+var posScale = 10;
 
 var objects = [];
 var raycaster, INTERSECTED;
-
-var has = {
-	WebVR: !!navigator.getVRDevices
-};
 
 vrHMD = new THREE.VRHMD( load );
 
@@ -33,8 +29,6 @@ function load(error) {
 		fullScreenButton.classList.add('error');
 
 		console.log(error);
-
-		return;
 	}
 
 	fullScreenButton.addEventListener('click', function(){
@@ -96,6 +90,8 @@ function setupWorld() {
 
 
 	// cubes
+	var cubes = new THREE.Object3D();
+
 	geometry = new THREE.BoxGeometry(30, 30, 30);
 
 	for (var i = 0; i < 500; i ++) {
@@ -119,10 +115,14 @@ function setupWorld() {
 		object.castShadow = true;
 		object.receiveShadow = true;
 
-		scene.add(object);
+		cubes.add(object);
 
 		objects.push(object);
 	}
+
+	var s = 1/50;
+	cubes.scale.set(s,s,s);
+	scene.add(cubes);
 }
 
 function setupLights() {
@@ -147,30 +147,15 @@ function setupRendering() {
 
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	vrEffect = new THREE.VREffect(renderer, vrHMD );
+	vrEffect = new THREE.VREffect(renderer, vrHMD);
 
 	element = renderer.domElement;
 	document.body.appendChild(element);
 }
 
 function setupControls() {
-	vrControls = new THREE.VRControls(head, vrHMD );//.getInput() );
+	vrControls = new THREE.VRControls(head, vrHMD);//.getInput() );
 	vrControls.setScale(posScale);
-
-	function setOrientationControls(e) {
-		if (!e.alpha) {
-			return;
-		}
-
-		vrControls = new THREE.DeviceOrientationControls(camera, true);
-		vrControls.connect();
-		vrControls.update();
-
-		fullScreenButton.addEventListener('click', fullscreen, false);
-
-		window.removeEventListener('deviceorientation', setOrientationControls, true);
-	}
-	window.addEventListener('deviceorientation', setOrientationControls, true);
 }
 
 function setupEvents() {
@@ -185,18 +170,6 @@ function onWindowResize() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// for mobile
-function fullscreen() {
-	if (element.requestFullscreen) {
-		element.requestFullscreen();
-	} else if (element.msRequestFullscreen) {
-		element.msRequestFullscreen();
-	} else if (element.mozRequestFullScreen) {
-		element.mozRequestFullScreen();
-	} else if (element.webkitRequestFullscreen) {
-		element.webkitRequestFullscreen();
-	}
-}
 
 function keyDown(e) {
 

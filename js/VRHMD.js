@@ -27,6 +27,8 @@ THREE.VRHMD = function ( done ) {
 					self.leftEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "left" );
 					self.rightEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "right" );
 
+					console.log( vrHMD );
+
 					break; // We keep the first we encounter
 				}
 			}

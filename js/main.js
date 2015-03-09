@@ -6,6 +6,7 @@ var renderer, element;
 var camera, scene;
 
 var player, head;
+var initialPos = 30;
 
 var fullScreenButton;
 
@@ -15,6 +16,8 @@ var vrEffect;
 
 var vrControls;
 var posScale = 10;
+
+var pauseMove = false;
 
 var objects = [];
 var raycaster, INTERSECTED;
@@ -54,7 +57,7 @@ function init() {
 	head.add(camera);
 
 	player = new THREE.Object3D();
-	player.position.set(0,0,30);
+	player.position.set(0,0,initialPos);
 	player.add(head);
 
 	scene.add(player);
@@ -155,7 +158,7 @@ function setupRendering() {
 }
 
 function setupControls() {
-	vrControls = new THREE.VRControls(head, vrHMD);//.getInput() );
+	vrControls = new THREE.VRControls(head, vrHMD);
 	vrControls.setScale(posScale);
 }
 
@@ -196,6 +199,9 @@ function keyDown(e) {
 		case 190: // >
 			vrControls.setScale(vrControls.getScale()*1.1);
 			break;
+		case 32: // space
+			pauseMove = !pauseMove;
+			break;
 	}
 
 }
@@ -211,9 +217,10 @@ function animate(t) {
 
 function update(dt) {
 	var pos = head.getWorldPosition();
+	var rot = head.getWorldQuaternion();
 
   var dir = new THREE.Vector3(0,0,-1);
-  dir = dir.applyQuaternion( head.quaternion );
+  dir = dir.applyQuaternion( rot );
 
 	raycaster.set( pos, dir );
 
@@ -233,7 +240,12 @@ function update(dt) {
 		INTERSECTED = null;
 	}
 
-	player.position.z -= 0.3*dt;
+	if (!pauseMove)
+		player.position.z -= 0.3*dt;
+
+	if (player.position.z < -15) {
+		player.position.z = initialPos;
+	}
 
 	vrControls.update();
 }

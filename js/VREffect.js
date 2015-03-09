@@ -14,6 +14,10 @@ THREE.VREffect = function ( renderer, hmd ) {
 		var self = this;
 
 		var vrHMD = hmd.getHMD();
+
+		if (vrHMD === undefined)
+			return;
+
 		self._vrHMD = vrHMD;
 		self.leftEyeTranslation = vrHMD.getEyeTranslation( "left" );
 		self.rightEyeTranslation = vrHMD.getEyeTranslation( "right" );
@@ -27,7 +31,7 @@ THREE.VREffect = function ( renderer, hmd ) {
 		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
 		// VR render mode if HMD is available
-		if ( vrHMD ) {
+		if ( vrHMD && this._fullScreen ) {
 			this.renderStereo.apply( this, arguments );
 			return;
 		}
@@ -50,8 +54,8 @@ THREE.VREffect = function ( renderer, hmd ) {
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
 
 		var renderer = this._renderer;
-		var renderWidth = renderTarget ? renderTarget.width : renderer.context.drawingBufferWidth;
-		var renderHeight = renderTarget ? renderTarget.height : renderer.context.drawingBufferHeight;
+		var renderWidth = renderTarget ? renderTarget.width : renderer.context.drawingBufferWidth / window.devicePixelRatio;
+		var renderHeight = renderTarget ? renderTarget.height : renderer.context.drawingBufferHeight / window.devicePixelRatio;
 		var eyeDivisionLine = renderWidth / 2;
 
 		if ( camera.parent === undefined ) {
@@ -61,7 +65,7 @@ THREE.VREffect = function ( renderer, hmd ) {
 		this.setCamera( camera, 'left' );
 		this.setCamera( camera, 'right' );
 
-		if (renderTarget)
+		if ( renderTarget )
 			renderer.setRenderTarget( renderTarget );
 
 		// render left eye
@@ -90,20 +94,18 @@ THREE.VREffect = function ( renderer, hmd ) {
 	};
 
 	this.setCamera = function( camera, eye ) {
-		if (eye === 'left') {
-			cameraLeft.projectionMatrix = this.FovToProjection( this.leftEyeFOV, true, camera.near, camera.far );
+		if ( eye !== 'left' && eye !== 'right' ) return;
 
-			camera.matrixWorld.decompose( cameraLeft.position, cameraLeft.quaternion, cameraLeft.scale );
+		var eyeCam = eye === 'left' ? cameraLeft : cameraRight;
+		var eyeTranslation = eye === 'left' ? this.leftEyeTranslation : this.rightEyeTranslation;
+		var eyeFOV = eye === 'left' ? this.leftEyeFOV	: this.rightEyeFOV;
 
-			cameraLeft.position.add( this.leftEyeTranslation );
-		}
-		if (eye === 'right') {
-			cameraRight.projectionMatrix = this.FovToProjection( this.rightEyeFOV, true, camera.near, camera.far );
+		eyeCam.projectionMatrix = this.FovToProjection( eyeFOV, true, camera.near, camera.far );
 
-			camera.matrixWorld.decompose( cameraRight.position, cameraRight.quaternion, cameraRight.scale );
+		camera.matrixWorld.decompose( eyeCam.position, eyeCam.quaternion, eyeCam.scale );
 
-			cameraRight.position.add( this.rightEyeTranslation );
-		}
+		eyeCam.translateX( eyeTranslation.x );
+		//eyeCam.position.add( eyeTranslation );
 	};
 
 	this.setFullScreen = function( enable ) {

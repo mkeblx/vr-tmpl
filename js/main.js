@@ -9,7 +9,7 @@ var player, head;
 var initialPos = 30;
 
 var vrHMD;
-var vrPlayer;
+var vrPlayerController;
 
 var pauseMove = false;
 
@@ -29,7 +29,7 @@ function load(error) {
 	}
 
 	fullScreenButton.addEventListener('click', function(){
-		vrPlayer.effect.setFullScreen(true);
+		vrPlayerController.effect.setFullScreen(true);
 	}, true);
 
 
@@ -50,13 +50,13 @@ function init() {
 
 	setupRendering();
 
-	vrPlayer = new THREE.VRPlayer( vrHMD, renderer, camera );
+	vrPlayerController = new THREE.VRPlayerController( vrHMD, renderer, camera );
 
-	player = vrPlayer.player;
+	player = vrPlayerController.player;
 	scene.add(player);
 	player.position.set(0,0,initialPos);
 
-	head = vrPlayer.head;
+	head = vrPlayerController.head;
 
 	setupWorld();
 	setupLights();
@@ -171,7 +171,7 @@ function keyDown(e) {
 			break;
 	}
 
-	vrPlayer.keydown(e);
+	vrPlayerController.keydown(e);
 
 }
 
@@ -216,9 +216,9 @@ function update(dt) {
 		player.position.z = initialPos;
 	}
 
-	vrPlayer.update(dt);
+	vrPlayerController.update(dt);
 }
 
 function render(dt) {
-	vrPlayer.render(scene);
+	vrPlayerController.render(scene);
 }

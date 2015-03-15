@@ -5,6 +5,7 @@ THREE.VREffect = function ( renderer, hmd, cameras ) {
 	this.cameraRight = cameras[1];
 
 	this._renderer = renderer;
+
 	this._renderScale = 1.1;
 
 	this.preLeftRender  = function(){ };
@@ -34,6 +35,11 @@ THREE.VREffect = function ( renderer, hmd, cameras ) {
 		// Regular render mode if not HMD
 		renderer.render.apply( this._renderer , arguments );
 	};
+
+	Object.defineProperty( this, 'renderScale', {
+		get: function() { return this._renderScale; },
+		set: function(val) { this._renderScale = val; }
+		});
 
 	this.setRenderScale = function ( scale, updateStyle ) {
 		updateStyle = updateStyle !== undefined ? updateStyle : true;

@@ -3,7 +3,7 @@
 /*
 VR Player Controller
 */
-THREE.VRPlayer = function( vrHMD, renderer, camera ) {
+THREE.VRPlayerController = function( vrHMD, renderer, camera ) {
 
 	this.camera = camera;
 
@@ -57,17 +57,17 @@ THREE.VRPlayer = function( vrHMD, renderer, camera ) {
 				break;
 			case 219: // [
 				if (document.mozFullScreenElement || document.webkitFullscreenElement)
-					this.effect.setRenderScale(this.effect.getRenderScale()*1/1.1);
+					this.effect.renderScale = this.effect.renderScale * 1/1.1;
 				break;
 			case 221: // ]
 				if (document.mozFullScreenElement || document.webkitFullscreenElement)
-					this.effect.setRenderScale(this.effect.getRenderScale()*1.1);
+					this.effect.renderScale = this.effect.renderScale * 1.1;
 				break;
 			case 188: // <
-				this.controls.setScale(this.controls.getScale()*1/1.1);
+				this.controls.scale = this.controls.scale * 1/1.1;
 				break;
 			case 190: // >
-				this.controls.setScale(this.controls.getScale()*1.1);
+				this.controls.scale = this.controls.scale * 1.1;
 				break;
 		}
 

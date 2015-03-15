@@ -4,7 +4,12 @@
 
 THREE.VRControls = function ( obj, hmd ) {
 
-	this.scale = 1;
+	this._scale = 1;
+
+	Object.defineProperty( this, 'scale', {
+		get: function() { return this._scale; },
+		set: function(val) { this._scale = val; }
+		});
 
 	this._init = function () {
 		var self = this;
@@ -26,7 +31,7 @@ THREE.VRControls = function ( obj, hmd ) {
 		}
 
 		if (obj && state.position !== null ) {
-			obj.position.copy( state.position ).multiplyScalar( this.scale );
+			obj.position.copy( state.position ).multiplyScalar( this._scale );
 		}
 
 	};

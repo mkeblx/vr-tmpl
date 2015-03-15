@@ -8,14 +8,8 @@ var camera, scene;
 var player, head;
 var initialPos = 30;
 
-var fullScreenButton;
-
 var vrHMD;
-
-var vrEffect;
-
-var vrControls;
-var posScale = 10;
+var vrPlayer;
 
 var pauseMove = false;
 
@@ -25,7 +19,7 @@ var raycaster, INTERSECTED;
 vrHMD = new THREE.VRHMD( load );
 
 function load(error) {
-	fullScreenButton = document.querySelector('#vr-button');	
+	var fullScreenButton = document.querySelector('#vr-button');	
 
 	if (error) {
 		fullScreenButton.innerHTML = error;
@@ -35,7 +29,7 @@ function load(error) {
 	}
 
 	fullScreenButton.addEventListener('click', function(){
-		vrEffect.setFullScreen(true);
+		vrPlayer.effect.setFullScreen(true);
 	}, true);
 
 
@@ -53,22 +47,20 @@ function init() {
 
 	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
 
-	head = new THREE.Object3D();
-	head.add(camera);
-
-	player = new THREE.Object3D();
-	player.position.set(0,0,initialPos);
-	player.add(head);
-
-	scene.add(player);
-
 
 	setupRendering();
+
+	vrPlayer = new THREE.VRPlayer( vrHMD, renderer, camera );
+
+	player = vrPlayer.player;
+	scene.add(player);
+	player.position.set(0,0,initialPos);
+
+	head = vrPlayer.head;
 
 	setupWorld();
 	setupLights();
 
-	setupControls();
 	setupEvents();
 }
 
@@ -151,16 +143,11 @@ function setupRendering() {
 
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	vrEffect = new THREE.VREffect(renderer, vrHMD);
 
 	element = renderer.domElement;
 	document.body.appendChild(element);
 }
 
-function setupControls() {
-	vrControls = new THREE.VRControls(head, vrHMD);
-	vrControls.setScale(posScale);
-}
 
 function setupEvents() {
 	window.addEventListener('resize', onWindowResize, false);
@@ -179,30 +166,12 @@ function keyDown(e) {
 
 	console.log(e.keyCode);
 	switch (e.keyCode) {
-		case 82: // R
-			vrControls.zeroSensor();
-			break;
-		case 70: // F
-			vrEffect.setFullScreen(true);
-			break;
-		case 219: // [
-			if (document.mozFullScreenElement || document.webkitFullscreenElement)
-				vrEffect.setRenderScale(vrEffect.getRenderScale()*1/1.1);
-			break;
-		case 221: // ]
-			if (document.mozFullScreenElement || document.webkitFullscreenElement)
-				vrEffect.setRenderScale(vrEffect.getRenderScale()*1.1);
-			break;
-		case 188: // <
-			vrControls.setScale(vrControls.getScale()*1/1.1);
-			break;
-		case 190: // >
-			vrControls.setScale(vrControls.getScale()*1.1);
-			break;
 		case 32: // space
 			pauseMove = !pauseMove;
 			break;
 	}
+
+	vrPlayer.keydown(e);
 
 }
 
@@ -247,9 +216,9 @@ function update(dt) {
 		player.position.z = initialPos;
 	}
 
-	vrControls.update();
+	vrPlayer.update(dt);
 }
 
 function render(dt) {
-	vrEffect.render(scene, camera);
+	vrPlayer.render(scene);
 }

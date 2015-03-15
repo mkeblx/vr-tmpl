@@ -1,8 +1,8 @@
 
-THREE.VREffect = function ( renderer, hmd ) {
+THREE.VREffect = function ( renderer, hmd, cameras ) {
 
-	var cameraLeft = new THREE.PerspectiveCamera();
-	var cameraRight = new THREE.PerspectiveCamera();
+	this.cameraLeft  = cameras[0];
+	this.cameraRight = cameras[1];
 
 	this._renderer = renderer;
 	this._renderScale = 1.1;
@@ -11,18 +11,14 @@ THREE.VREffect = function ( renderer, hmd ) {
 	this.preRightRender = function(){ };
 
 	this._init = function() {
-		var self = this;
-
 		var vrHMD = hmd.getHMD();
 
 		if (vrHMD === undefined)
 			return;
 
-		self._vrHMD = vrHMD;
-		self.leftEyeTranslation = vrHMD.getEyeTranslation( "left" );
-		self.rightEyeTranslation = vrHMD.getEyeTranslation( "right" );
-		self.leftEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "left" );
-		self.rightEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "right" );
+		this._vrHMD = vrHMD;
+		this.leftEyeFOV  = vrHMD.getRecommendedEyeFieldOfView( 'left' );
+		this.rightEyeFOV = vrHMD.getRecommendedEyeFieldOfView( 'right' );
 	};
 
 	this._init();
@@ -50,6 +46,7 @@ THREE.VREffect = function ( renderer, hmd ) {
 		return this._renderScale;
 	};
 
+	this.cameraSet = false;
 
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
 
@@ -62,8 +59,12 @@ THREE.VREffect = function ( renderer, hmd ) {
 			camera.updateMatrixWorld();
 		}
 
-		this.setCamera( camera, 'left' );
-		this.setCamera( camera, 'right' );
+		// TODO: cache & invalidate on change
+		if (!this.cameraSet) {
+			this.setCamera( camera, 'left' );
+			this.setCamera( camera, 'right' );
+			this.cameraSet = true;
+		}
 
 		if ( renderTarget )
 			renderer.setRenderTarget( renderTarget );
@@ -72,13 +73,13 @@ THREE.VREffect = function ( renderer, hmd ) {
 		this.preLeftRender();
 
 		crop( 0, 0, eyeDivisionLine, renderHeight );
-		renderer.render( scene, cameraLeft, renderTarget, forceClear );
+		renderer.render( scene, this.cameraLeft, renderTarget, forceClear );
 
 		// render right eye
 		this.preRightRender();
 
 		crop( eyeDivisionLine,0, eyeDivisionLine, renderHeight );
-		renderer.render( scene, cameraRight, renderTarget, forceClear );
+		renderer.render( scene, this.cameraRight, renderTarget, forceClear );
 
 		// restore...
 		renderer.setViewport( 0, 0, renderWidth, renderHeight );
@@ -94,19 +95,12 @@ THREE.VREffect = function ( renderer, hmd ) {
 	};
 
 	this.setCamera = function( camera, eye ) {
-		if ( eye !== 'left' && eye !== 'right' ) return;
-
-		var eyeCam = eye === 'left' ? cameraLeft : cameraRight;
-		var eyeTranslation = eye === 'left' ? this.leftEyeTranslation : this.rightEyeTranslation;
+		var eyeCam = eye === 'left' ? this.cameraLeft : this.cameraRight;
 		var eyeFOV = eye === 'left' ? this.leftEyeFOV	: this.rightEyeFOV;
 
 		eyeCam.projectionMatrix = this.FovToProjection( eyeFOV, true, camera.near, camera.far );
-
-		camera.matrixWorld.decompose( eyeCam.position, eyeCam.quaternion, eyeCam.scale );
-
-		eyeCam.translateX( eyeTranslation.x );
-		//eyeCam.position.add( eyeTranslation );
 	};
+
 
 	this.setFullScreen = function( enable ) {
 		var renderer = this._renderer;

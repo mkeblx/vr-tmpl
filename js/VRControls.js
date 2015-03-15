@@ -45,10 +45,11 @@ THREE.VRControls = function ( obj, hmd ) {
 		this.scale = val;
 	};
 
-	this.zeroSensor = function() {
+	this.resetSensor = function() {
 		if ( this._vrInput === undefined ) return;
 
 		this._vrInput.zeroSensor && this._vrInput.zeroSensor();
 	};
+	this.zeroSensor = this.resetSensor;
 
 };

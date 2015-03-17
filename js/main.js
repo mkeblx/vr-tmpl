@@ -6,7 +6,7 @@ var renderer, element;
 var camera, scene;
 
 var player, head;
-var initialPos = 30;
+var initialPos = { x: 0, y: 0, z: 30 };
 
 var vrHMD;
 var vrPlayerController;
@@ -14,7 +14,9 @@ var vrPlayerController;
 var pauseMove = false;
 
 var objects = [];
+var cubes;
 var raycaster, INTERSECTED;
+
 
 vrHMD = new THREE.VRHMD( load );
 
@@ -50,11 +52,13 @@ function init() {
 
 	setupRendering();
 
+	console.log( vrHMD );
+
 	vrPlayerController = new THREE.VRPlayerController( vrHMD, renderer, camera );
 
 	player = vrPlayerController.player;
 	scene.add(player);
-	player.position.set(0,0,initialPos);
+	//player.position.copy(initialPos);
 
 	head = vrPlayerController.head;
 
@@ -85,7 +89,7 @@ function setupWorld() {
 	//scene.add(mesh);
 
 	// cubes
-	var cubes = new THREE.Object3D();
+	cubes = new THREE.Object3D();
 
 	geometry = new THREE.BoxGeometry(30, 30, 30);
 
@@ -168,6 +172,9 @@ function keyDown(e) {
 	switch (e.keyCode) {
 		case 32: // space
 			pauseMove = !pauseMove;
+			break;
+		case 68: // d
+			if (INTERSECTED) cubes.remove(INTERSECTED);
 			break;
 	}
 

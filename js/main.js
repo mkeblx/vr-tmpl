@@ -21,7 +21,7 @@ var raycaster, INTERSECTED;
 vrHMD = new THREE.VRHMD( load );
 
 function load(error) {
-	var fullScreenButton = document.querySelector('#vr-button');	
+	var fullScreenButton = document.querySelector('#vr-button');
 
 	if (error) {
 		fullScreenButton.innerHTML = error;
@@ -143,7 +143,7 @@ function setupRendering() {
 		antialias: true
 	});
 	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setClearColor(0xffffff, 0);
+	renderer.setClearColor( 0xffffff );
 
 
 	renderer.setSize(window.innerWidth, window.innerHeight);

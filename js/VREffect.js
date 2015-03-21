@@ -61,9 +61,10 @@ THREE.VREffect = function ( renderer, hmd, cameras ) {
 			camera.updateMatrixWorld();
 		}
 
-
 		if ( renderTarget )
 			renderer.setRenderTarget( renderTarget );
+
+		renderer.clear();
 
 		// render left eye
 		this.preLeftRender();

@@ -15,41 +15,47 @@ THREE.VRPlayerController = function( vrHMD, renderer, camera ) {
 	var HMD = vrHMD.getHMD();
 	var input = vrHMD.getInput();
 
-	var  leftEyeTranslation = HMD.getEyeTranslation( 'left' );
-	var rightEyeTranslation = HMD.getEyeTranslation( 'right' );
+	var  leftEyeTranslation = HMD ? HMD.getEyeTranslation( 'left' ) : 0;
+	var rightEyeTranslation = HMD ? HMD.getEyeTranslation( 'right' ): 0;
 
-	var  leftEyeFOV = HMD.getRecommendedEyeFieldOfView( 'left' );
-	var rightEyeFOV = HMD.getRecommendedEyeFieldOfView( 'right' );
+	var  leftEyeFOV = HMD ? HMD.getRecommendedEyeFieldOfView( 'left' ) : null;
+	var rightEyeFOV = HMD ? HMD.getRecommendedEyeFieldOfView( 'right' ) : null;
 
 	this._init = function() {
+		this.renderer = renderer;
 
-		//this.setCamera( camera, 'left', leftEyeFOV );
-		//this.setCamera( camera, 'right', rightEyeFOV );
-		this.cameraLeft.projectionMatrix  = this.FovToProjection( leftEyeFOV, true, camera.near, camera.far );
-		this.cameraRight.projectionMatrix = this.FovToProjection( rightEyeFOV, true, camera.near, camera.far );
 
 		var head = new THREE.Object3D();
 		head.add(this.camera);
 		this.head = head;
 
-
-		var scale = 1;
-		this.cameraLeft.position.copy( leftEyeTranslation ).multiplyScalar( scale );
-		this.cameraRight.position.copy( rightEyeTranslation ).multiplyScalar( scale );
 		head.add( this.cameraLeft );
 		head.add( this.cameraRight );
+
+		var scale = 1;
+		if ( HMD ) {
+			//this.setCamera( camera, 'left', leftEyeFOV );
+			//this.setCamera( camera, 'right', rightEyeFOV );
+			this.cameraLeft.projectionMatrix  = this.FovToProjection( leftEyeFOV, true, camera.near, camera.far );
+			this.cameraRight.projectionMatrix = this.FovToProjection( rightEyeFOV, true, camera.near, camera.far );
+
+			this.cameraLeft.position.copy( leftEyeTranslation ).multiplyScalar( scale );
+			this.cameraRight.position.copy( rightEyeTranslation ).multiplyScalar( scale );
+		}
 
 		var player = new THREE.Object3D();
 		player.add(head);
 		this.player = player;
 
+		if ( vrHMD ) {
+			this.effect = new THREE.VREffect( renderer, vrHMD, [ this.cameraLeft, this.cameraRight ] );
+			this.renderer = this.effect;
 
-		this.effect = new THREE.VREffect( renderer, vrHMD, [ this.cameraLeft, this.cameraRight ] );
 
-
-		this.posScale = 10;
-		this.controls = new THREE.VRControls( head, vrHMD );
-		this.controls.setScale( this.posScale );
+			this.posScale = 10;
+			this.controls = new THREE.VRControls( head, vrHMD );
+			this.controls.setScale( this.posScale );
+		}
 
 		this.scene = null;
 
@@ -64,7 +70,7 @@ THREE.VRPlayerController = function( vrHMD, renderer, camera ) {
 
 
 	this.render = function(scene) {
-		this.effect.render( scene, this.camera );
+		this.renderer.render( scene, this.camera );
 	};
 
 	this.keydown = function(e) {

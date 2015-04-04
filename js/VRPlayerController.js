@@ -7,19 +7,35 @@ THREE.VRPlayerController = function( vrHMD, renderer, camera ) {
 
 	this.camera = camera;
 
-	this.cameraLeft  = new THREE.PerspectiveCamera();
-	this.cameraRight = new THREE.PerspectiveCamera();
+	this.cameraL = new THREE.PerspectiveCamera();
+	this.cameraR = new THREE.PerspectiveCamera();
 
 	//console.log( vrHMD );
 
 	var HMD = vrHMD.getHMD();
 	var input = vrHMD.getInput();
 
-	var  leftEyeTranslation = HMD ? HMD.getEyeTranslation( 'left' ) : 0;
-	var rightEyeTranslation = HMD ? HMD.getEyeTranslation( 'right' ): 0;
+	var eyeFOVL, eyeFOVR;
+	var eyeTranslationL, eyeTranslationR;
 
-	var  leftEyeFOV = HMD ? HMD.getRecommendedEyeFieldOfView( 'left' ) : null;
-	var rightEyeFOV = HMD ? HMD.getRecommendedEyeFieldOfView( 'right' ) : null;
+	if ( HMD ) {
+		if ( HMD.getEyeParameters !== undefined ) {
+			var eyeParamsL = HMD.getEyeParameters( 'left' );
+			var eyeParamsR = HMD.getEyeParameters( 'right' );
+
+			eyeTranslationL = eyeParamsL.eyeTranslation;
+			eyeTranslationR = eyeParamsR.eyeTranslation;
+			eyeFOVL = eyeParamsL.recommendedFieldOfView;
+			eyeFOVR = eyeParamsR.recommendedFieldOfView;
+		} else {
+			// TODO: This is an older code path and not spec compliant.
+			// It should be removed at some point in the near future.
+			eyeTranslationL = HMD.getEyeTranslation( 'left' );
+			eyeTranslationR = HMD.getEyeTranslation( 'right' );
+			eyeFOVL = HMD.getRecommendedEyeFieldOfView( 'left' );
+			eyeFOVR = HMD.getRecommendedEyeFieldOfView( 'right' );
+		}
+	}
 
 	this._init = function() {
 		this.renderer = renderer;
@@ -29,18 +45,19 @@ THREE.VRPlayerController = function( vrHMD, renderer, camera ) {
 		head.add(this.camera);
 		this.head = head;
 
-		head.add( this.cameraLeft );
-		head.add( this.cameraRight );
+		head.add( this.cameraL );
+		head.add( this.cameraR );
 
 		var scale = 1;
-		if ( HMD ) {
-			//this.setCamera( camera, 'left', leftEyeFOV );
-			//this.setCamera( camera, 'right', rightEyeFOV );
-			this.cameraLeft.projectionMatrix  = this.FovToProjection( leftEyeFOV, true, camera.near, camera.far );
-			this.cameraRight.projectionMatrix = this.FovToProjection( rightEyeFOV, true, camera.near, camera.far );
 
-			this.cameraLeft.position.copy( leftEyeTranslation ).multiplyScalar( scale );
-			this.cameraRight.position.copy( rightEyeTranslation ).multiplyScalar( scale );
+		if ( HMD ) {
+			//this.setCamera( camera, 'left',  eyeFOVL );
+			//this.setCamera( camera, 'right', eyeFOVR );
+			this.cameraL.projectionMatrix = this.FovToProjection( eyeFOVL, true, camera.near, camera.far );
+			this.cameraR.projectionMatrix = this.FovToProjection( eyeFOVR, true, camera.near, camera.far );
+
+			this.cameraL.position.copy( eyeTranslationL ).multiplyScalar( scale );
+			this.cameraR.position.copy( eyeTranslationR ).multiplyScalar( scale );
 		}
 
 		var player = new THREE.Object3D();
@@ -48,7 +65,7 @@ THREE.VRPlayerController = function( vrHMD, renderer, camera ) {
 		this.player = player;
 
 		if ( vrHMD ) {
-			this.effect = new THREE.VREffect( renderer, vrHMD, [ this.cameraLeft, this.cameraRight ] );
+			this.effect = new THREE.VREffect( renderer, vrHMD, [ this.cameraL, this.cameraR ] );
 			this.renderer = this.effect;
 
 

@@ -58,7 +58,7 @@ function init() {
 
 	player = vrPlayerController.player;
 	scene.add(player);
-	//player.position.copy(initialPos);
+	player.position.copy(initialPos);
 
 	head = vrPlayerController.head;
 
@@ -220,7 +220,7 @@ function update(dt) {
 		player.position.z -= 0.3*dt;
 
 	if (player.position.z < -15) {
-		player.position.z = initialPos;
+		player.position.copy(initialPos);
 	}
 
 	vrPlayerController.update(dt);

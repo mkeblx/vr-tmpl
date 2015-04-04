@@ -2,7 +2,9 @@
 THREE.VRHMD = function ( done ) {
 
 	this._init = function() {
+
 		var self = this;
+
 		if ( !navigator.getVRDevices ) {
 			if ( done ) {
 				done("Your browser is not VR Ready");
@@ -21,13 +23,6 @@ THREE.VRHMD = function ( done ) {
 				if ( devices[i] instanceof HMDVRDevice ) {
 					vrHMD = devices[i];
 					self._vrHMD = vrHMD;
-
-					self.leftEyeTranslation = vrHMD.getEyeTranslation( "left" );
-					self.rightEyeTranslation = vrHMD.getEyeTranslation( "right" );
-					self.leftEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "left" );
-					self.rightEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "right" );
-
-					console.log( vrHMD );
 
 					break; // We keep the first we encounter
 				}

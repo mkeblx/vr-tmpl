@@ -1,8 +1,8 @@
 
 THREE.VREffect = function ( renderer, hmd, cameras ) {
 
-	this.cameraLeft  = cameras[0];
-	this.cameraRight = cameras[1];
+	this.cameraL = cameras[0];
+	this.cameraR = cameras[1];
 
 	this._renderer = renderer;
 
@@ -70,13 +70,13 @@ THREE.VREffect = function ( renderer, hmd, cameras ) {
 		this.preLeftRender();
 
 		crop( 0, 0, eyeDivisionLine, renderHeight );
-		renderer.render( scene, this.cameraLeft, renderTarget, forceClear );
+		renderer.render( scene, this.cameraL, renderTarget, forceClear );
 
 		// render right eye
 		this.preRightRender();
 
 		crop( eyeDivisionLine,0, eyeDivisionLine, renderHeight );
-		renderer.render( scene, this.cameraRight, renderTarget, forceClear );
+		renderer.render( scene, this.cameraR, renderTarget, forceClear );
 
 		// restore...
 		renderer.setViewport( 0, 0, renderWidth, renderHeight );

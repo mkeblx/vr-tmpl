@@ -17,6 +17,11 @@ var objects = [];
 var cubes;
 var raycaster, INTERSECTED;
 
+var options = {
+		scale: 1,
+		posScale: 10
+	};
+
 
 vrHMD = new THREE.VRHMD( load );
 
@@ -54,7 +59,7 @@ function init() {
 
 	console.log( vrHMD );
 
-	vrPlayerController = new THREE.VRPlayerController( vrHMD, renderer, camera );
+	vrPlayerController = new THREE.VRPlayerController( vrHMD, options, renderer, camera );
 
 	player = vrPlayerController.player;
 	scene.add(player);

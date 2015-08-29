@@ -4,6 +4,8 @@ THREE.VREffect = function ( renderer, hmd, cameras ) {
 	this.cameraL = cameras[0];
 	this.cameraR = cameras[1];
 
+	this.useDistortion = true;
+
 	this._renderer = renderer;
 
 	this._renderScale = 1.1;
@@ -137,9 +139,15 @@ THREE.VREffect = function ( renderer, hmd, cameras ) {
 			}
 		}
 		if ( canvas.mozRequestFullScreen ) {
-			canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
+			if ( this.useDistortion )
+				canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
+			else
+				canvas.mozRequestFullScreen();
 		} else {
-			canvas.webkitRequestFullscreen( { vrDisplay: vrHMD } );
+			if ( this.useDistortion )
+				canvas.webkitRequestFullscreen( { vrDisplay: vrHMD } );
+			else
+				canvas.webkitRequestFullscreen();
 		}
 	};
 

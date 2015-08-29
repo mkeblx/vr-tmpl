@@ -17,25 +17,39 @@ body {
 	position: fixed;
 }
 
-#vr-button {
+#menu {
 	position: fixed;
 	top: 20px;
 	left: 20px;
-	padding: 8px;
+}
+
+.btn {
+	padding: 12px 14px;
 	color: #fff;
 	background-color: #555;
+
+	font-size: 16px;
+	line-height: 16px;
+	text-align: center;
+
+	margin-bottom: 8px;
 
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	-ms-user-select: none;
 }
 
-#vr-button:hover {
+.btn:hover {
 	cursor: pointer;
 	background-color: rgb(18, 36, 70);
 }
 
-#vr-button.error {
+#enter-vr {
+
+}
+
+#enter-vr.error {
 	pointer-events: none;
 	background-color: red;
 }
+

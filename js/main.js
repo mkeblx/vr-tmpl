@@ -7,11 +7,10 @@ var camera, scene;
 
 var player, head;
 var initialPos = { x: 0, y: 0, z: 30 };
+var moving = false;
 
 var vrHMD;
 var vrPlayerController;
-
-var pauseMove = false;
 
 var objects = [];
 var cubes;
@@ -25,8 +24,16 @@ var options = {
 
 vrHMD = new THREE.VRHMD( load );
 
+var useDistortion = true;
+document.getElementById('distortion-toggle').addEventListener('click', function(event){
+		useDistortion = !useDistortion;
+
+		window.e = event.target.innerHTML = useDistortion ? 'Distortion' : 'No Distortion';
+	}, false);
+
+
 function load(error) {
-	var fullScreenButton = document.querySelector('#vr-button');
+	var fullScreenButton = document.getElementById('enter-vr');
 
 	if (error) {
 		fullScreenButton.innerHTML = error;
@@ -36,6 +43,8 @@ function load(error) {
 	}
 
 	fullScreenButton.addEventListener('click', function(){
+		vrPlayerController.effect.useDistortion = useDistortion;
+
 		vrPlayerController.effect.setFullScreen(true);
 	}, true);
 
@@ -176,7 +185,7 @@ function keyDown(e) {
 	console.log(e.keyCode);
 	switch (e.keyCode) {
 		case 32: // space
-			pauseMove = !pauseMove;
+			moving = !moving;
 			break;
 		case 68: // d
 			if (INTERSECTED) cubes.remove(INTERSECTED);
@@ -221,7 +230,7 @@ function update(dt) {
 		INTERSECTED = null;
 	}
 
-	if (!pauseMove)
+	if (!moving)
 		player.position.z -= 0.3*dt;
 
 	if (player.position.z < -15) {

@@ -293,7 +293,7 @@ function MouseKeyboardPositionSensorVRDevice() {
   this.deviceName = 'VR Position Device (webvr-polyfill:mouse-keyboard)';
 
   // Attach to mouse and keyboard events.
-  window.addEventListener('keydown', this.onKeyDown_.bind(this));
+  //window.addEventListener('keydown', this.onKeyDown_.bind(this));
   window.addEventListener('mousemove', this.onMouseMove_.bind(this));
   window.addEventListener('mousedown', this.onMouseDown_.bind(this));
   window.addEventListener('mouseup', this.onMouseUp_.bind(this));

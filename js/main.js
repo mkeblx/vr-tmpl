@@ -46,7 +46,7 @@ function load(error) {
 		vrPlayerController.effect.useDistortion = useDistortion;
 
 		vrPlayerController.effect.setFullScreen(true);
-	}, true);
+	}, false);
 
 
 	init();
@@ -75,6 +75,11 @@ function init() {
 	player.position.copy(initialPos);
 
 	head = vrPlayerController.head;
+	var cursor = new THREE.Mesh(
+		new THREE.SphereGeometry(0.04),
+		new THREE.MeshBasicMaterial({ color: 0x3366ff }) );
+	cursor.position.set(0,0,-5);
+	head.add(cursor);
 
 	setupWorld();
 	setupLights();
@@ -159,7 +164,8 @@ function setupRendering() {
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setClearColor( 0xffffff );
 
-
+	var U = 256;
+	//renderer.setSize(U*2, U);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 
 	element = renderer.domElement;
@@ -168,8 +174,21 @@ function setupRendering() {
 
 
 function setupEvents() {
-	window.addEventListener('resize', onWindowResize, false);
+	//window.addEventListener('resize', onWindowResize, false);
 	document.addEventListener('keydown', keyDown, false);
+
+	element.addEventListener('click', function(event){
+
+		if (document.webkitFullscreenElement || document.mozFullScreenElement) {
+			console.log('click');
+
+			if ( INTERSECTED ) {
+				// TODO: more satisfying... animate+audio
+				cubes.remove( INTERSECTED );
+			}
+		}
+
+	}, false);
 }
 
 function onWindowResize() {
@@ -230,7 +249,7 @@ function update(dt) {
 		INTERSECTED = null;
 	}
 
-	if (!moving)
+	if (moving)
 		player.position.z -= 0.3*dt;
 
 	if (player.position.z < -15) {

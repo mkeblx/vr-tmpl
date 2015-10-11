@@ -1,5 +1,5 @@
 
-THREE.VRHMD = function ( done ) {
+var VRHMD = function ( done ) {
 
 	this._init = function() {
 

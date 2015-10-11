@@ -30,7 +30,7 @@ THREE.VRControls = function ( obj, hmd ) {
 			obj.quaternion.copy( state.orientation );
 		}
 
-		if (obj && state.position !== null ) {
+		if ( obj && state.position !== null ) {
 			obj.position.copy( state.position ).multiplyScalar( this._scale );
 		}
 

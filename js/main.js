@@ -22,7 +22,7 @@ var options = {
 	};
 
 
-vrHMD = new THREE.VRHMD( load );
+vrHMD = new VRHMD( load );
 
 var useDistortion = true;
 document.getElementById('distortion-toggle').addEventListener('click', function(event){
@@ -130,8 +130,8 @@ function setupWorld() {
 		object.scale.y = Math.random() * 2 + 1;
 		object.scale.z = Math.random() * 2 + 1;
 
-		object.castShadow = true;
-		object.receiveShadow = true;
+		//object.castShadow = true;
+		//object.receiveShadow = true;
 
 		cubes.add(object);
 

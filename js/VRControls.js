@@ -11,7 +11,7 @@ THREE.VRControls = function ( obj, hmd ) {
 		set: function(val) { this._scale = val; }
 		});
 
-	this._init = function () {
+	this._init = function() {
 		var self = this;
 		self._vrInput = hmd.getInput();
 		self.obj = obj;
@@ -19,7 +19,11 @@ THREE.VRControls = function ( obj, hmd ) {
 
 	this._init();
 
-	this.update = function( ) {
+	this.setInput = function( input ) {
+		this._vrInput = input;
+	}
+
+	this.update = function() {
 		var obj = this.obj;
 
 		if ( this._vrInput === undefined ) return;
@@ -46,7 +50,7 @@ THREE.VRControls = function ( obj, hmd ) {
 		return this.scale;
 	};
 
-	this.setScale = function(val) {
+	this.setScale = function( val ) {
 		this.scale = val;
 	};
 

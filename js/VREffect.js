@@ -24,7 +24,7 @@ THREE.VREffect = function ( renderer, hmd, cameras ) {
 
 	this._init();
 
-	this.render = function ( scene, camera, renderTarget, forceClear ) {
+	this.render = function( scene, camera, renderTarget, forceClear ) {
 		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
 		// VR render mode if HMD is available

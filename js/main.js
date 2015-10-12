@@ -24,6 +24,9 @@ var options = {
 
 vrHMD = new VRHMD( load );
 
+var fileSensor;
+
+
 var useDistortion = true;
 document.getElementById('distortion-toggle').addEventListener('click', function(event){
 		useDistortion = !useDistortion;
@@ -85,6 +88,10 @@ function init() {
 	setupLights();
 
 	setupEvents();
+
+	fileSensor = new FilePositionSensorVRDevice({
+		file: 'data/sensor-data.json'
+	});
 }
 
 

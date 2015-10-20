@@ -26,6 +26,7 @@ vrHMD = new VRHMD( load );
 
 var fileSensor;
 
+var loader = new THREE.TextureLoader();
 
 var useDistortion = true;
 document.getElementById('distortion-toggle').addEventListener('click', function(event){
@@ -101,7 +102,7 @@ function setupWorld() {
 	var geometry = new THREE.PlaneGeometry(2000, 2000, 1, 1);
 	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-	var texture = THREE.ImageUtils.loadTexture('textures/checker.png');
+	var texture = loader.load('textures/checker.png');
 	texture.wrapS = THREE.RepeatWrapping;
 	texture.wrapT = THREE.RepeatWrapping;
 

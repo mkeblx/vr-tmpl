@@ -50,6 +50,13 @@ FilePositionSensorVRDevice.prototype._loadFile = function( file ) {
         self.data.push( state );
       }
 
+      if (len) {
+        if (self.data[0].orientation)
+          self.hasOrientation = true;
+        if (self.data[0].position)
+          self.hasPosition = true;
+      }
+
     });
 };
 
@@ -60,9 +67,9 @@ FilePositionSensorVRDevice.prototype.getState = function() {
 
   var state = {
     hasOrientation: this.hasOrientation,
-    orientation: this.hasOrientation ? this.getOrientation( this.i ) : null,
+    orientation: this.hasOrientation ? this._getOrientation( this.i ) : null,
     hasPosition: this.hasPosition,
-    position: this.hasPosition ? this.getPosition( this.i ) : null
+    position: this.hasPosition ? this._getPosition( this.i ) : null
   }
 
   this.i++;
@@ -73,7 +80,15 @@ FilePositionSensorVRDevice.prototype.getState = function() {
 
 };
 
-FilePositionSensorVRDevice.prototype.getOrientation = function( i ) {
+FilePositionSensorVRDevice.prototype.getImmediateState = function( i ) {
+  return this.getState( i );
+};
+
+FilePositionSensorVRDevice.prototype.resetSensor = function() {
+
+};
+
+FilePositionSensorVRDevice.prototype._getOrientation = function( i ) {
   var d = this.data[ i ].orientation;
 
   if (!d) return null;
@@ -85,7 +100,7 @@ FilePositionSensorVRDevice.prototype.getOrientation = function( i ) {
   return orientation;
 };
 
-FilePositionSensorVRDevice.prototype.getPosition = function( i ) {
+FilePositionSensorVRDevice.prototype._getPosition = function( i ) {
   var d = this.data[ i ].position;
 
   if (!d) return null;
